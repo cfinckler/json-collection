@@ -20,8 +20,8 @@ import net.hamnaberg.json.extension.Extended;
 import net.hamnaberg.json.util.ListOps;
 import net.hamnaberg.json.util.MapOps;
 import net.hamnaberg.json.util.Optional;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.node.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.*;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -71,7 +71,7 @@ public final class Property extends Extended<Property> {
         Map<String, Value> builder = MapOps.newHashMap();
         JsonNode object = delegate.get("object");
         if (object != null && object.isObject()) {
-            Iterator<Map.Entry<String,JsonNode>> fields = object.getFields();
+            Iterator<Map.Entry<String,JsonNode>> fields = object.fields();
             while (fields.hasNext()) {
                 Map.Entry<String, JsonNode> next = fields.next();
                 Optional<Value> opt = ValueFactory.createValue(next.getValue());

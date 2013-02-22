@@ -16,14 +16,15 @@
 
 package net.hamnaberg.json.parser;
 
+import com.fasterxml.jackson.core.TreeNode;
 import net.hamnaberg.json.*;
 import net.hamnaberg.json.Collection;
 import net.hamnaberg.json.util.Charsets;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.*;
 
@@ -98,9 +99,13 @@ public class CollectionParser {
         return parseTemplate(new StringReader(input));
     }
 
-    private Collection parse(JsonNode node) throws IOException {
-        JsonNode collectionNode = node.get("collection");
-        return parseCollection(collectionNode);
+    private Collection parse(TreeNode node) throws IOException {
+        if (node instanceof ObjectNode) {
+            ObjectNode obj = (ObjectNode) node;
+            JsonNode collectionNode = obj.get("collection");
+            return parseCollection(collectionNode);
+        }
+        throw new IllegalArgumentException("Illegal JSON here");
     }
 
     private Collection parseCollection(JsonNode collectionNode) {
@@ -109,12 +114,15 @@ public class CollectionParser {
         return c;
     }
 
-    private Template parseTemplate(JsonNode collectionNode) {
-        JsonNode node = collectionNode.get("template");
-        if (node != null) {
-            return objectFactory.createTemplate((ObjectNode) node);
+    private Template parseTemplate(TreeNode node) {
+        if (node instanceof ObjectNode) {
+            ObjectNode obj = (ObjectNode) node;
+            JsonNode template = obj.get("template");
+            if (template != null) {
+                return objectFactory.createTemplate((ObjectNode) template);
+            }
         }
-        return null;
+        throw new IllegalArgumentException("Illegal JSON here");
     }
 
     private static InternalObjectFactory objectFactory = new InternalObjectFactory() {

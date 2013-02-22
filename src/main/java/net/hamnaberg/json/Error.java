@@ -17,8 +17,8 @@
 package net.hamnaberg.json;
 
 import net.hamnaberg.json.extension.Extended;
-import org.codehaus.jackson.node.JsonNodeFactory;
-import org.codehaus.jackson.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class Error extends Extended<Error> {
     public static final Error EMPTY = Error.create(null, null, null);
