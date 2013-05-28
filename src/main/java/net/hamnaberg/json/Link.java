@@ -17,6 +17,7 @@
 package net.hamnaberg.json;
 
 import net.hamnaberg.json.extension.Extended;
+import net.hamnaberg.json.navigation.Navigator;
 import net.hamnaberg.json.util.ListOps;
 import net.hamnaberg.json.util.Optional;
 import net.hamnaberg.json.util.Preconditions;
@@ -120,6 +121,10 @@ public final class Link extends Extended<Link> {
         node.put("render", render.getName());
         return copy(node);
     }
+    public Optional<Collection> follow(Navigator navigator) {
+        return navigator.follow(getHref());
+    }
+
 
     public void validate() {
         Preconditions.checkArgument(getHref() != null, "Href was null");
