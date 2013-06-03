@@ -15,7 +15,8 @@ import java.net.URLConnection;
 
 public class URLConnectionNavigator implements Navigator {
 
-    public static final String ACCEPT = "application/vnd.collection+json,*/*;q=0.1";
+    public static final String CONTENT_TYPE = "application/vnd.collection+json";
+    public static final String ACCEPT = CONTENT_TYPE + ",*/*;q=0.1";
 
     @Override
     public final Optional<Collection> follow(URI href) {
@@ -48,13 +49,45 @@ public class URLConnectionNavigator implements Navigator {
     }
 
     @Override
-    public final void create(URI href, Template template) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public final Optional<Collection> create(URI href, Template template) {
+        HttpURLConnection connection = null;
+        try {
+            connection = getConnection(href);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", CONTENT_TYPE);
+            template.writeTo(connection.getOutputStream());
+            if (connection.getResponseCode() == 201) {
+                String location = connection.getHeaderField("Location");
+                if (location != null) {
+                    return follow(URI.create(location));
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return Optional.none();
     }
 
     @Override
-    public final void update(Item item) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public final boolean update(Item item) {
+        HttpURLConnection connection = null;
+        try {
+            connection = getConnection(item.getHref());
+            connection.setRequestMethod("PUT");
+            connection.setRequestProperty("Content-Type", CONTENT_TYPE);
+            item.toTemplate().writeTo(connection.getOutputStream());
+            return isSuccessful(connection.getResponseCode());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
     }
 
     private boolean isCollectionJSON(HttpURLConnection connection) {

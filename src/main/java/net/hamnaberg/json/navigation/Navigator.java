@@ -9,6 +9,6 @@ import java.net.URI;
 
 public interface Navigator {
     Optional<Collection> follow(URI href);
-    void create(URI href, Template template);
-    void update(Item item);
+    Optional<Collection> create(URI href, Template template);
+    boolean update(Item item);
 }
