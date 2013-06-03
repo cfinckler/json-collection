@@ -18,6 +18,7 @@ package net.hamnaberg.json;
 
 
 import net.hamnaberg.json.extension.Extended;
+import net.hamnaberg.json.navigation.Navigator;
 import net.hamnaberg.json.util.ListOps;
 import net.hamnaberg.json.util.Optional;
 import net.hamnaberg.json.util.Predicate;
@@ -114,6 +115,14 @@ public final class Collection extends Extended<Collection> implements Writable {
 
     public Optional<Error> getError() {
         return hasError() ? Optional.some(new Error((ObjectNode) delegate.get("error"))) : Optional.<Error>none();
+    }
+
+    public Optional<Collection> addItem(Navigator navigator, Template template) {
+        URI href = getHref();
+        if (href == null) {
+            throw new UnsupportedOperationException("Collection has no href, unable to POST to remote.");
+        }
+        return navigator.create(href, template);
     }
 
     public Optional<Link> linkByName(final String name) {
